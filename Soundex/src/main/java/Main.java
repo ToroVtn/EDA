@@ -1,6 +1,3 @@
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 public class Main {
     public static void main(String[] args) {
         //SOUNDEX
