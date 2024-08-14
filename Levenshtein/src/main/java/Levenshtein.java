@@ -18,6 +18,6 @@ public class Levenshtein {
     public static double normalized(String s1, String s2){
         int lenght = (s1.length() > s2.length()) ? s1.length() : s2.length();
 
-        return (double) recursive(s1, s2, s1.length(), s2.length())/lenght;
+        return 1 - (double) recursive(s1, s2, s1.length(), s2.length())/lenght;
     }
 }
