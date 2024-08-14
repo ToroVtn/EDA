@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>EDA-unidad2</groupId>
+    <groupId>EDA.unidad2</groupId>
     <artifactId>Soundex</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -21,7 +21,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>Proof</mainClass>
+                    <mainClass>Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -40,7 +40,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>main.Proof</mainClass>
+                                    <mainClass>main.Main</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
