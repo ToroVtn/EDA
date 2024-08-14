@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class Soundex {
     public static String representation(String in){
         String aux = in.toUpperCase();
@@ -35,7 +38,7 @@ public class Soundex {
         return similarity/len;
     }
 
-    private static char getMapping(char c) { //switch is not a good implementation
+    private static char getMapping(char c) { //switch is not a good implementation (maybe)
         //a good implementation could be with a hashmap
         return switch (c) {
             case 'A', 'E', 'I', 'O', 'U', 'W', 'H', 'Y' -> '0';
@@ -48,4 +51,31 @@ public class Soundex {
             default -> 'c';
         };
     }
+
+
+    //below is probably not the way
+    private static char getMapping2(char c){
+        return mappings.get(getCharKey(c)).charAt(0);
+    }
+
+    private static String getCharKey(char c) {
+        for(String string : mapping){
+            if (string.contains(Character.toString(c))) return string;
+        }
+        return "";
+    }
+
+    private static Map<String, String> mappings = new HashMap<>(){
+        {
+            put("AEIOUWHY", "0");
+            put("BFPV", "1");
+            put("CGJKQSXZ", "2");
+            put("DT", "3");
+            put("L", "4");
+            put("MN", "5");
+            put("R", "6");
+        }
+    };
+
+    private static String[] mapping = new String[]{"AEIOUWHY", "BFPV", "CGJKQSXZ", "DT", "L", "MN", "R"};
 }
