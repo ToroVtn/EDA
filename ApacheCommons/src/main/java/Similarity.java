@@ -2,20 +2,23 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.language.Metaphone;
 import org.apache.commons.codec.language.Soundex;
 import org.apache.commons.text.similarity.FuzzyScore;
-import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.apache.commons.text.similarity.LevenshteinDetailedDistance;
+import org.apache.commons.text.similarity.LevenshteinResults;
 
 import java.util.Locale;
 
 
 public class Similarity {
-    private LevenshteinDistance levenshtein = new LevenshteinDistance();
+    private LevenshteinDetailedDistance levenshtein = new LevenshteinDetailedDistance();
     private Soundex soundex = new Soundex();
     private Metaphone metaphone = new Metaphone();
     private FuzzyScore qgram = new FuzzyScore(Locale.ENGLISH);
+    private LevenshteinResults result;
 
     public double[] similarity(String text1, String text2) {
         double[] distances = new double[3];
-        distances[0] = levenshtein.apply(text1, text2);
+        result = levenshtein.apply(text1, text2);
+        distances[0] = result.getDistance();
         try {
             distances[1] = soundex.difference(text1, text2);
         } catch (EncoderException e) {
@@ -25,4 +28,15 @@ public class Similarity {
         return distances;
     }
 
+    public String soundexEncode(String text1) {
+        return soundex.encode(text1);
+    }
+
+    public String levenshteinOperations(String text1, String text2) {
+        if(result == null) throw new IllegalStateException("must call similarity first");
+
+        return "%d substitutions, %d deletions, %i insertions"
+                .formatted( result.getSubstituteCount(),
+                            result.getDeleteCount(), result.getInsertCount());
+    }
 }
