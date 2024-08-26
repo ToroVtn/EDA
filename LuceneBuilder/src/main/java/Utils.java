@@ -59,7 +59,19 @@ public class Utils {
         return listFilesAbsolutePath(getPrefixDir() + "/" + subdir, extension);
     }
 
+    public static void main(String[] args) throws IOException {
+        System.out.println(Utils.getPrefixDir());
 
+        System.out.println("Absolute Path ----");
+        for (String fileName : Utils.listFilesAbsolutePath("c:/lucene/docs/", Arrays.asList("txt", "pdf"))) {
+            System.out.println(fileName);
+        }
+
+        System.out.println("Relative Path ----");
+        for (String fileName : Utils.listFilesRelativePath("docs", Arrays.asList("txt", "pdf"))) {
+            System.out.println(fileName);
+        }
+    }
 
 
 }
