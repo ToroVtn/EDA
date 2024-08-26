@@ -1,0 +1,1 @@
+prefixDir=c:/lucene/
