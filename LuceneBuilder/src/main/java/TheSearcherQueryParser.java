@@ -1,32 +1,23 @@
+import org.apache.lucene.search.IndexSearcher;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.search.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.PrefixQuery;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.QueryBuilder;
+
 
 import java.io.IOException;
 import java.nio.file.Paths;
 
 
-public class TheSearcher {
+public class TheSearcherQueryParser {
 
     private static IndexReader getIndexReader() throws IOException {
 
@@ -46,24 +37,10 @@ public class TheSearcher {
             searcher.setSimilarity(new ClassicSimilarity());
 
 
-            // field of interest
-            String fieldName = "content";
-//            String queryStr= "game";
-//
-//            Term myTerm = new Term(fieldName, queryStr);
-//            Query query= new PrefixQuery(myTerm );
-
-//            Query query = new TermRangeQuery(fieldName,
-//                    new BytesRef("gam"), new BytesRef("gaming"),
-//                    false, false);
-
-//            Query query = new PhraseQuery("content", "game", "video", "game");
-
-//            Query query = new WildcardQuery(new Term(fieldName, "g*e"));
-
-            Query query = new FuzzyQuery(new Term(fieldName, "geam"));
-
-                QueryBuilder queryBuilder = new QueryBuilder(new StandardAnalyzer());
+            String queryStr= "agem~2"; //can add fieldType like "content:agem~2"
+//                                                                  Î
+            QueryParser queryparser = new QueryParser(       "content", new StandardAnalyzer() );
+            Query query= queryparser.parse(queryStr);
 
             // run the query
             long startTime = System.currentTimeMillis();
@@ -90,14 +67,11 @@ public class TheSearcher {
                 // print docID, score
                 System.out.println(aD);
 
-                // obtain ALL the stored fields
+                // obtain the stored fields
                 Document aDoc = searcher.doc(docID);
-                System.out.println("Stored fields: " + aDoc);
-                System.out.println(aDoc.get("path"));
-                System.out.println(aDoc.get("content"));
-				 /*
-				Explanation rta = searcher.explain(query, docID);
-	            System.out.println(rta);*/
+                System.out.println("stored fields: " + aDoc);
+//				Explanation rta = searcher.explain(query, docID);
+//	            System.out.println(rta);
 
                 position++;
                 System.out.println();
