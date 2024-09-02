@@ -1,13 +1,55 @@
 public class ArraysUtilities {
     public static void main(String[] args) {
         int[] unsorted = new int[] {34, 10, 8, 60, 21, 17, 28, 30, 2, 70, 50, 15, 62, 40};
-        quicksort( unsorted) ;
+        mergeSort( unsorted); ;
 
         for (int i : unsorted) {
             System.out.print(i + " ");
         }
     }
 
+    public static void mergeSort(int[] unsorted) {
+        mergeSort(unsorted, 0, unsorted.length-1);
+    }
+
+    public static void mergeSort(int[] unsorted, int l, int r) {
+        if (l>=r) return;
+
+        int m = (l + r) / 2;
+        mergeSort(unsorted, l, m);
+        mergeSort(unsorted, m+1, r);
+
+        merge(unsorted, l, m, r);
+    }
+
+    private static void merge(int[] unsorted, int l, int m, int r) {
+        int n1 = m-l+1;
+        int n2 = r-m;
+        int[] left = new int[n1];
+        int[] right = new int[n2];
+        for(int i = 0; i < m-l+1; i++) {
+            left[i] = unsorted[i+l];
+        }
+        for(int i = 0; i < r-m; i++) {
+            right[i] = unsorted[i+m+1];
+        }
+
+        int i = 0, j = 0, k=l;
+        while (i < n1 && j < n2) {
+            if (left[i] <= right[j]) {
+                unsorted[k++] = left[i++];
+            } else
+                unsorted[k++] = right[j++];
+        }
+
+        while (i < n1)  unsorted[k++] = left[i++];
+        while (j < n2)  unsorted[k++] = right[j++];
+    }
+
+    //34 10 8 60 21 17 28 30 2 70 50 15 62 40
+    //   8 10   34
+    //  10 34    8 60
+    //
     public static void quicksort(int[] unsorted) {
         quicksort (unsorted, unsorted.length-1);
     }
