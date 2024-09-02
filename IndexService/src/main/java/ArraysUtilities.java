@@ -8,6 +8,7 @@ public class ArraysUtilities {
         }
     }
 
+    //O(N*logN) time O(N) space?
     public static void mergeSort(int[] unsorted) {
         mergeSort(unsorted, 0, unsorted.length-1);
     }
@@ -46,10 +47,7 @@ public class ArraysUtilities {
         while (j < n2)  unsorted[k++] = right[j++];
     }
 
-    //34 10 8 60 21 17 28 30 2 70 50 15 62 40
-    //   8 10   34
-    //  10 34    8 60
-    //
+    //O(N? logN) time O(1)/O(N) espacial?
     public static void quicksort(int[] unsorted) {
         quicksort (unsorted, unsorted.length-1);
     }
@@ -59,8 +57,7 @@ public class ArraysUtilities {
     }
 
     private static void quicksortHelper (int[] unsorted, int leftPos, int rightPos) {
-        if (rightPos <= leftPos )
-            return;
+        if (rightPos <= leftPos ) return;
 
         // tomamos como pivot el primero. Podria ser otro elemento
         int pivotValue= unsorted[leftPos];
@@ -71,16 +68,11 @@ public class ArraysUtilities {
         // particionar el cjto sin el pivot
         int pivotPosCalculated= partition(unsorted, leftPos, rightPos-1, pivotValue);
 
-
         // el pivot en el lugar correcto
         swap(unsorted, pivotPosCalculated, rightPos);
 
-
-        // salvo unsorted[middle] todo puede estar mal
-        // pero cada particion es autonoma
         quicksortHelper(unsorted, leftPos, pivotPosCalculated - 1);
         quicksortHelper(unsorted, pivotPosCalculated + 1, rightPos );
-
     }
 
     static private int partition(int[] unsorted, int leftPos, int rightPos, int pivotValue) {
@@ -98,14 +90,9 @@ public class ArraysUtilities {
         return leftPos;
     }
 
-    // 3 2 10 1 40 60 70 80 /15
-
     static private void swap(int[] unsorted, int pos1, int pos2) {
         int auxi= unsorted[pos1];
         unsorted[pos1]= unsorted[pos2];
         unsorted[pos2]= auxi;
     }
-
-
-
 }
