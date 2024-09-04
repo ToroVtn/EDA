@@ -62,21 +62,21 @@ public class IndexWithDuplicates implements IndexService{
         if(dim == 0) return 0;
         int low = 0;
         int high = dim-1;
-        int mid = (low + high)/2;
+        int mid;
         while(low <= high){
             mid = (low + high)/2;
             if (key == arr[mid]){
-                while (arr[mid] == key && mid<dim){
+                while (mid<dim && arr[mid] == key){
                     mid++;
                 }
-                return mid-1;
+                return mid;
             }
-            else if (key > arr[mid]) // x is on the right side
-                low = mid + 1;
-            else                       // x is on the left side
+            else if (key < arr[mid]) // x is on the right side
                 high = mid - 1;
+            else                       // x is on the left side
+                low = mid + 1;
         }
-        return mid;
+        return low;
     }
 
     public int[] range(int leftKey, int rightKey, boolean leftIncluded, boolean rightIncluded){
@@ -84,27 +84,21 @@ public class IndexWithDuplicates implements IndexService{
 
         IndexService result = new IndexWithDuplicates();
         int leftIndex = getClosestPosition(leftKey);
-        int rightIndex = getClosestPosition(rightKey);
-        if(arr[leftIndex]==leftKey) {
-            if(!leftIncluded){
-                leftIndex++;
+        if(leftIncluded) {
+            leftIndex--;
+            while(leftIndex >= 0 && arr[leftIndex]==leftKey){
+                leftIndex--;
             }
-            else {
-                while(leftIndex>=0 && arr[leftIndex] == leftKey){
-                    leftIndex--;
-                }
-                leftIndex++;
-            }
+            leftIndex++;
         }
-        if(arr[rightIndex]==rightKey) {
-            if(!rightIncluded){
-                while(arr[rightIndex] == rightKey){
-                    rightIndex--;
-                }
+        if(rightIncluded) {
+            for (int i = leftIndex; arr[i] <= rightKey; i++) {
+                result.insert(arr[i]);
             }
-        }
-        for(int i=leftIndex; i<=rightIndex; i++){
-            result.insert(arr[i]);
+        } else {
+            for (int i = leftIndex; arr[i] < rightKey; i++) {
+                result.insert(arr[i]);
+            }
         }
         result.sortedPrint();
         return result.getArray();
