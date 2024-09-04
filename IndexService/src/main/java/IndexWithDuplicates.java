@@ -82,40 +82,32 @@ public class IndexWithDuplicates implements IndexService{
     public int[] range(int leftKey, int rightKey, boolean leftIncluded, boolean rightIncluded){
         if(leftKey>rightKey) return new int[0];
 
-//        IndexService result = new IndexWithDuplicates();
-//        int first = getClosestPosition(leftKey);
-//        if(!leftIncluded && arr[first]==leftKey) first++;
-//        int last = getClosestPosition(rightKey);
-//        if(arr[first]==leftKey && leftIncluded){
-//            for(int i = first; i >= 0 && arr[i]==leftKey; i--){
-//                result.insert(arr[i]);
-//            }
-//            first++;
-//        }
-//        if(!rightIncluded) {
-//            while(arr[last]==rightKey){
-//                last--;
-//            }
-//            last++;
-//        }
-//        if(arr[last]==leftKey && rightIncluded){
-//            for(int i = last; i >= 0 && arr[i]==rightKey; i--){
-//                result.insert(arr[i]);
-//            }
-//        }
-//        for (int i = first; i < last; i++){
-//            result.insert(arr[i]);
-//        }
-
-//        return result.getArray();
-
-        if(!leftIncluded) {
-            leftKey = arr[getClosestPosition(leftKey)+1];
+        IndexService result = new IndexWithDuplicates();
+        int leftIndex = getClosestPosition(leftKey);
+        int rightIndex = getClosestPosition(rightKey);
+        if(arr[leftIndex]==leftKey) {
+            if(!leftIncluded){
+                leftIndex++;
+            }
+            else {
+                while(leftIndex>=0 && arr[leftIndex] == leftKey){
+                    leftIndex--;
+                }
+                leftIndex++;
+            }
         }
-        if(rightIncluded) {
-            rightKey = arr[getClosestPosition(rightKey)+1];
+        if(arr[rightIndex]==rightKey) {
+            if(!rightIncluded){
+                while(arr[rightIndex] == rightKey){
+                    rightIndex--;
+                }
+            }
         }
-        return Arrays.copyOfRange(arr, leftKey, rightKey); // [e, e)
+        for(int i=leftIndex; i<=rightIndex; i++){
+            result.insert(arr[i]);
+        }
+        result.sortedPrint();
+        return result.getArray();
     }
 
     public int getDim(){
