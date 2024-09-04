@@ -92,12 +92,12 @@ public class IndexWithDuplicates implements IndexService{
             }
             leftIndex++;
         }
+        int i;
+        for (i = leftIndex; arr[i] < rightKey; i++) {
+            result.insert(arr[i]);
+        }
         if(rightIncluded) {
-            for (int i = leftIndex; arr[i] <= rightKey; i++) {
-                result.insert(arr[i]);
-            }
-        } else {
-            for (int i = leftIndex; arr[i] < rightKey; i++) {
+            for (i = i; arr[i] <= rightKey; i++) {
                 result.insert(arr[i]);
             }
         }
