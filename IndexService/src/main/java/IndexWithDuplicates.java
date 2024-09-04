@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class IndexWithDuplicates implements IndexService{
     private int CHUNK_SIZE = 10;
@@ -18,15 +19,20 @@ public class IndexWithDuplicates implements IndexService{
         return arr[getClosestPosition(key)] == key;
     }
 
+    public int[] getArray(){
+        return Arrays.copyOf(arr, dim);
+    }
+
     @Override
     public void insert(int key) {
         if(arr.length == dim) Arrays.copyOf(arr, dim + CHUNK_SIZE);
         int index = getClosestPosition(key);
-        int i = dim-1;
-        while (i != index){
+        int i = Math.max(dim - 1, 0);
+        while (i >= index && i>=0){
             arr[i+1] = arr[i];
             i--;
         }
+        dim++;
         arr[index] = key;
     }
 
@@ -53,13 +59,14 @@ public class IndexWithDuplicates implements IndexService{
     }
 
     private int getClosestPosition(int key){
+        if(dim == 0) return 0;
         int low = 0;
-        int high = arr.length-1;
+        int high = dim-1;
         int mid = (low + high)/2;
         while(low <= high){
             mid = (low + high)/2;
             if (key == arr[mid]){
-                while (arr[mid] == key){
+                while (arr[mid] == key && mid<dim){
                     mid++;
                 }
                 return mid-1;
@@ -71,4 +78,66 @@ public class IndexWithDuplicates implements IndexService{
         }
         return mid;
     }
+
+    public int[] range(int leftKey, int rightKey, boolean leftIncluded, boolean rightIncluded){
+        if(leftKey>rightKey) return new int[0];
+
+//        IndexService result = new IndexWithDuplicates();
+//        int first = getClosestPosition(leftKey);
+//        if(!leftIncluded && arr[first]==leftKey) first++;
+//        int last = getClosestPosition(rightKey);
+//        if(arr[first]==leftKey && leftIncluded){
+//            for(int i = first; i >= 0 && arr[i]==leftKey; i--){
+//                result.insert(arr[i]);
+//            }
+//            first++;
+//        }
+//        if(!rightIncluded) {
+//            while(arr[last]==rightKey){
+//                last--;
+//            }
+//            last++;
+//        }
+//        if(arr[last]==leftKey && rightIncluded){
+//            for(int i = last; i >= 0 && arr[i]==rightKey; i--){
+//                result.insert(arr[i]);
+//            }
+//        }
+//        for (int i = first; i < last; i++){
+//            result.insert(arr[i]);
+//        }
+
+//        return result.getArray();
+
+        if(!leftIncluded) {
+            leftKey = arr[getClosestPosition(leftKey)+1];
+        }
+        if(rightIncluded) {
+            rightKey = arr[getClosestPosition(rightKey)+1];
+        }
+        return Arrays.copyOfRange(arr, leftKey, rightKey); // [e, e)
+    }
+
+    public int getDim(){
+        return dim;
+    }
+
+    public void sortedPrint(){
+        for (int i = 0; i < dim; i++){
+            System.out.print(arr[i] + " ");
+        }
+        System.out.println();
+    }
+
+    public int getMax(){
+        if(dim == 0) throw new NoSuchElementException("Array is empty");
+        return arr[dim-1];
+    }
+
+    public int getMin(){
+        if(dim == 0) throw new NoSuchElementException("Array is empty");
+        return arr[0];
+    }
+
+
 }
