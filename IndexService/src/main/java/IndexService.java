@@ -5,7 +5,6 @@ public interface IndexService {
     void delete(int key);
     int occurrences(int key);
     int[] getArray();
-    int getDim();
 
     // devuelve un nuevo arreglo ordenado con los elementos que pertenecen al intervalo dado por
     // leftkey y rightkey. Si el mismo es abierto/cerrado depende de las variables leftIncluded

@@ -58,6 +58,7 @@ public class IndexWithDuplicates implements IndexService{
         return sum;
     }
 
+    //returns the last appearance, or if absent, the first higher number (its a binary search)
     private int getClosestPosition(int key){
         if(dim == 0) return 0;
         int low = 0;
@@ -101,10 +102,6 @@ public class IndexWithDuplicates implements IndexService{
             }
         }
         return result.getArray();
-    }
-
-    public int getDim(){
-        return dim;
     }
 
     public void sortedPrint(){
