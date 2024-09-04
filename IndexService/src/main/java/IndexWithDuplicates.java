@@ -100,7 +100,6 @@ public class IndexWithDuplicates implements IndexService{
                 result.insert(arr[i]);
             }
         }
-        result.sortedPrint();
         return result.getArray();
     }
 
