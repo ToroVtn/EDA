@@ -120,6 +120,4 @@ public class IndexWithDuplicates implements IndexService{
         if(dim == 0) throw new NoSuchElementException("Array is empty");
         return arr[0];
     }
-
-
 }
