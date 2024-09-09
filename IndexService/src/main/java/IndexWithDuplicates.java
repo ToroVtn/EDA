@@ -1,11 +1,10 @@
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-public class IndexWithDuplicates implements IndexService{
+public class IndexWithDuplicates{
     private int CHUNK_SIZE = 10;
     private int[] arr = new int[CHUNK_SIZE];
     private int dim=0;
-    @Override
     public void initialize(int[] elements) {
         if(elements == null) throw new IllegalArgumentException("elements cannot be null");
 
@@ -14,7 +13,6 @@ public class IndexWithDuplicates implements IndexService{
         }
     }
 
-    @Override
     public boolean search(int key) {
         return arr[getClosestPosition(key)] == key;
     }
@@ -23,7 +21,6 @@ public class IndexWithDuplicates implements IndexService{
         return Arrays.copyOf(arr, dim);
     }
 
-    @Override
     public void insert(int key) {
         if(arr.length == dim) Arrays.copyOf(arr, dim + CHUNK_SIZE);
         int index = getClosestPosition(key);
@@ -36,7 +33,6 @@ public class IndexWithDuplicates implements IndexService{
         arr[index] = key;
     }
 
-    @Override
     public void delete(int key) {
         int index = getClosestPosition(key);
         if(arr[index] != key) return;
@@ -47,7 +43,6 @@ public class IndexWithDuplicates implements IndexService{
         dim--;
     }
 
-    @Override
     public int occurrences(int key) {
         int sum = 0;
         int i = getClosestPosition(key);
@@ -83,7 +78,7 @@ public class IndexWithDuplicates implements IndexService{
     public int[] range(int leftKey, int rightKey, boolean leftIncluded, boolean rightIncluded){
         if(leftKey>rightKey) return new int[0];
 
-        IndexService result = new IndexWithDuplicates();
+        IndexWithDuplicates result = new IndexWithDuplicates();
         int leftIndex = getClosestPosition(leftKey);
         if(leftIncluded) {
             leftIndex--;
