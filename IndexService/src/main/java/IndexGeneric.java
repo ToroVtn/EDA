@@ -23,9 +23,9 @@ public class IndexGeneric<T extends Comparable<? super T>> implements IndexServi
 
     @Override
     public void insert(T key) {
-        if(arr.length == dim) Arrays.copyOf(arr, dim + CHUNK_SIZE);
+        if(arr.length == dim) arr = Arrays.copyOf(arr, dim + CHUNK_SIZE);
         int index = getClosestPosition(key);
-        int i = Math.max(dim - 1, 0);
+        int i = dim-1;
         while (i >= index && i>=0){
             arr[i+1] = arr[i];
             i--;
@@ -46,10 +46,9 @@ public class IndexGeneric<T extends Comparable<? super T>> implements IndexServi
         if(dim == 0) return 0;
         int low = 0;
         int high = dim-1;
-        int mid;
         while(low <= high){
-            mid = (low + high)/2;
-            if (key.compareTo(arr[mid]) == 0){
+            int mid = (low + high)/2;
+            if (key.compareTo(arr[mid]) == 0){ // if found return the last index + 1
                 while (mid<dim && key.compareTo(arr[mid]) == 0){
                     mid++;
                 }

@@ -8,6 +8,7 @@ class IndexWithDuplicatesTest {
     @BeforeEach
     void initialize() {
         myIndex.initialize(new Integer[] {100, 50, 30, 50, 80, 100, 100, 30});
+        myIndex.sortedPrint();
         assertArrayEquals(new Integer[]{30, 30, 50, 50, 80, 100, 100, 100}, myIndex.getArray());
     }
 
