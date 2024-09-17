@@ -112,9 +112,8 @@ public class IndexGeneric<T extends Comparable<? super T>> implements IndexServi
     @Override
     public void sortedPrint() {
         for (int i = 0; i < dim; i++){
-            System.out.print(arr[i] + " ");
+            System.out.println(arr[i]);
         }
-        System.out.println();
     }
 
     @Override
