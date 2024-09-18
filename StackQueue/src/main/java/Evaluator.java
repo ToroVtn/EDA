@@ -25,28 +25,45 @@ public class Evaluator {
 
     public String infixToPostfix() {
         String postfija= "";
-        Stack<String> theStack= new Stack<String>();
+        Stack<String> auxStack = new Stack<>();
         while( lineScanner.hasNext() ) {
             String currentToken = lineScanner.next();
             if ( !isOperand(currentToken) ) {
+                if(isVariable(currentToken)) {
+                    currentToken = String.valueOf(vbles.get(currentToken));
+                }
                 postfija += String.format("%s ", currentToken);
             }
             else {
-                while (!theStack.empty() && getPrecedence(theStack.peek(), currentToken) ) {
-                    postfija += String.format("%s ", theStack.pop() );
+                while (!auxStack.empty() && getPrecedence(auxStack.peek(), currentToken) ) {
+                    postfija += String.format("%s ", auxStack.pop() );
                 }
-                theStack.push(currentToken);
+                auxStack.push(currentToken);
+                if(currentToken.equals(")")){
+                    while(!auxStack.peek().equals("(")){
+                        auxStack.pop();
+                        postfija += String.format("%s ", auxStack.pop());
+                    }
+                    auxStack.pop();
+                }
             }
         }
-        while ( !theStack.empty() ) {
-            postfija += String.format("%s ", theStack.pop() );
+        while ( !auxStack.empty() ) {
+            postfija += String.format("%s ", auxStack.pop() );
         }
         return postfija;
     }
 
     private boolean isOperand(String s) {
-        return s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/") || s.equals("^");
+        return mapping.containsKey(s);
     }
+
+    private boolean isVariable(String s){
+        return vbles.containsKey(s);
+    }
+
+    private static Map<String, Double> vbles = new HashMap<String, Double>()
+    { { put("nro1", 0.2); put("x", -2.0); put("y", 2.0); } };
 
     public void operate(String line) {
         switch (line) {
@@ -57,7 +74,8 @@ public class Evaluator {
             }
             case "-": {
                 check();
-                stack.push(stack.pop() - stack.pop());
+                Double sub = stack.pop();
+                stack.push(stack.pop() - sub);
                 return;
             }
             case "*": {
@@ -86,15 +104,17 @@ public class Evaluator {
     }
 
     private static Map<String, Integer> mapping = new HashMap<>(){
-        {   put("+", 0); put("-", 1); put("*", 2); put("/", 3); put("^", 4); }
+        {   put("+", 0); put("-", 1); put("*", 2); put("/", 3); put("^", 4); put("(", 5); put(")", 6);  }
     };
 
     private static boolean precedenceMatrix[][] = {
-            {true, true, false, false, false},
-            {true, true, false, false, false},
-            {true, true, true, true, false},
-            {true, true, true, true, false},
-            {true, true, true, true, false}
+            {true, true, false, false, false, false, false},
+            {true, true, false, false, false, false, false},
+            {true, true, true, true, false, false, false},
+            {true, true, true, true, false, false, false},
+            {true, true, true, true, false, false, false},
+            {false, false, false, false, false, false, false},
+            {false, false, false, false, false, false, false}
     };
 
     private boolean getPrecedence(String last, String current){
