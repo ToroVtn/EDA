@@ -291,61 +291,99 @@ public class SortedLinkedList<T extends Comparable<? super T>> implements Sorted
         }
     }
 
+    public IteratorWithOp<T> iterWithOp(){
+        return new IteratorWithOp<T>() {
+            Node current = root;
+            Node prev, prev2;
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
 
+            @Override
+            public T next() {//1 3 5
+                prev2 = prev; //reference to change the next for removal
+                prev = current; //element to erase
+                current = current.next;
+                return prev.data;
+            }// p2 = 0 ; p = 1 ; c = 3
+
+            public void remove(){
+                if(prev==null) throw new IllegalStateException("must call next() before remove");
+                if(prev==root){
+                    root = current;
+                    return;
+                }
+                prev2.next = current;
+            }
+
+            public void insert(T data) {
+                if(data == null || data.compareTo(current.data) >= 0 || data.compareTo(prev.data) <= 0)
+                    throw new IllegalArgumentException("invalid data for insertion at this position");
+
+                Node aux= new Node(data, current);
+                if(current==root){
+                    root = aux;
+                    return;
+                }
+                prev.next = aux;
+            }
+        };
+    }
 
 
 
     public static void main(String[] args) {
         SortedLinkedList<String> l = new SortedLinkedList<>();
 
-        System.out.println("lista" +  (l.isEmpty()? "":" NO") + " vacia");
+        System.out.println("lista " +  (l.isEmpty()? "":"NO") + " vacia");
         System.out.println(l.size() );
         System.out.println(l.getMin() );
         System.out.println(l.getMax() );
         System.out.println();
 
         System.out.println(l.insert("hola"));
+        System.out.println("size " +l.size());
         l.dump();
-        System.out.println(l.size());
         System.out.println();
 
         System.out.println("lista " +  (l.isEmpty()? "":"NO") + " vacia");
         System.out.println();
 
         System.out.println(l.insert("tal"));
-        System.out.println(l.size());
+        System.out.println("size " + l.size());
         l.dump();
         System.out.println();
 
         System.out.println(l.insert("ah"));
-        System.out.println(l.size());
+        System.out.println("size " +l.size());
         l.dump();
         System.out.println();
 
         System.out.println(l.insert("veo"));
-        System.out.println(l.size());
+        System.out.println("size " +l.size());
         l.dump();
         System.out.println();
 
         System.out.println(l.insert("bio"));
-        System.out.println(l.size());
+        System.out.println("size " +l.size());
         l.dump();
         System.out.println();
 
         System.out.println(l.insert("tito"));
-        System.out.println(l.size());
+        System.out.println("size " +l.size());
         l.dump();
         System.out.println();
 
 
         System.out.println(l.insert("hola"));
-        System.out.println(l.size());
+        System.out.println("size " +l.size());
         l.dump();
         System.out.println();
 
 
         System.out.println(l.insert("aca"));
-        System.out.println(l.size());
+        System.out.println("size " +l.size());
         l.dump();
         System.out.println();
 
@@ -354,8 +392,10 @@ public class SortedLinkedList<T extends Comparable<? super T>> implements Sorted
         System.out.println(l.getMax() );
         System.out.println();
 
-        System.out.println(l.remove("hola"));
-        System.out.println(l.size());
+        IteratorWithOp<String> iter = l.iterWithOp();
+        System.out.println(iter.next() + " ; " + iter.next());
+        System.out.println();
+        iter.insert("ba");
         l.dump();
     }
 
