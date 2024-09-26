@@ -318,15 +318,21 @@ public class SortedLinkedList<T extends Comparable<? super T>> implements Sorted
             }
 
             public void insert(T data) {
-                if(data == null || data.compareTo(current.data) >= 0 || data.compareTo(prev.data) <= 0)
+                if(data == null)
                     throw new IllegalArgumentException("invalid data for insertion at this position");
 
                 Node aux= new Node(data, current);
                 if(current==root){
-                    root = aux;
+                    if(root.data.compareTo(data) <= 0) throw new IllegalArgumentException("invalid data for insertion at this position");
+                    root = current = aux;
                     return;
                 }
-                prev.next = aux;
+                if(current==null){
+                    if(prev.data.compareTo(data) >= 0) throw new IllegalArgumentException("invalid data for insertion at this position");
+                    prev.next = current = aux;
+                    return;
+                }
+                prev.next = current = aux;
             }
         };
     }
@@ -393,9 +399,7 @@ public class SortedLinkedList<T extends Comparable<? super T>> implements Sorted
         System.out.println();
 
         IteratorWithOp<String> iter = l.iterWithOp();
-        System.out.println(iter.next() + " ; " + iter.next());
-        System.out.println();
-        iter.insert("ba");
+        iter.insert("a");
         l.dump();
     }
 
