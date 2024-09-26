@@ -1,14 +1,14 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 // lista simplemente encadenada, no acepta repetidos (false e ignora) ni nulls (exception)
-public class SortedLinkedList<T extends Comparable<? super T>>{
-
-    private Node root;
-    private int size=0;
+public class SortedLinkedList<T extends Comparable<? super T>> implements SortedListService<T>{
+    private int size =0;
     private T max;
+    private Node root;
 
-    // insert resuelto todo en la clase SortedLinkedList, iterativo
-    public boolean insert(T data) {
+    // insert resuelto en la clase SortedLinkedList, iterativo
+    public boolean insert1(T data) {
 
         if (data == null)
             throw new IllegalArgumentException("data cannot be null");
@@ -24,7 +24,7 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
 
         // repetido?
         if (current!=null && current.data.compareTo(data) == 0) {
-            System.out.println(String.format("Insertion failed. %s repeated", data));
+            System.err.println(String.format("Insertion failed. %s repeated", data));
             return false;
         }
 
@@ -38,14 +38,12 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
             // nodo interno
             prev.next= aux;
         }
-        if(current==null){
-            max=data;
-        }
-        size++;
+
         return true;
     }
 
-    // insert resuelto todo en la clase SortedLinkedList, recursivo
+
+    // insert resuelto en la clase SortedLinkedList, recursivo
     public boolean insert2(T data) {
         if (data == null)
             throw new IllegalArgumentException("data cannot be null");
@@ -55,35 +53,80 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         return rta[0];
     }
 
+
     public Node insertRec(T data, Node current, boolean[] rta) {
+        if(current!=null && data.compareTo(current.data)==0) {
+            System.out.printf("Insertion failed. %s repeated%n", data);
+            rta[0] = false;
+            return current;
+        }
 
-        return null;
+        if(current!=null && data.compareTo(current.data) < 0){
+            current.next = insertRec(data, current.next, rta);
+            return current;
+        }
 
+        rta[0] = true;
+        return new Node(data, current);
     }
 
-    // insert resuelto delegando al nodo
-    public boolean insert3(T data) {
-
-        // COMPLETAR
-        return true;
+    // insert resuelto delegando al nodo todo
+    public boolean insert(T data) {
+        if(data == null) throw new IllegalArgumentException("data cannot be null");
+        if(root == null){
+            root = new Node(data, null);
+            max = data;
+            size++;
+            return true;
+        }
+        boolean[] rta = new boolean[1];
+        root = root.insert(data, rta);
+        if(rta[0])  size++;
+        return rta[0];
     }
 
+    @Override
     public boolean find(T data) {
         return getPos(data) != -1;
     }
 
+
     // delete resuelto todo en la clase SortedLinkedList, iterativo
+    @Override
     public boolean remove(T data) {
-        // completar
-        return true;
+        if(data == null) throw new IllegalArgumentException();
+
+        Node current = root;
+        Node prev = root;
+        while (current != null && current.data.compareTo(data) < 0) {
+            prev = current;
+            current = current.next;
+        }
+
+        if(current!=null && current.data.compareTo(data) == 0){
+            if(current==root){
+                root=root.next;
+            } else {
+                prev.next = current.next;
+                if (data.compareTo(max) == 0) {
+                    max = prev.data;
+                }
+                size--;
+                return true;
+            }
+        }
+        return false;
     }
 
+
     // delete resuelto todo en la clase SortedLinkedList, recursivo
+//	@Override
     public boolean remove2(T data) {
         // completar
         return true;
 
     }
+
 
     public Node removeRec(T data, Node current, boolean[] rta) {
 
@@ -91,16 +134,22 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         return null;
     }
 
+
     // delete resuelto delegando al nodo
+//	@Override
     public boolean remove3(T data) {
         // completar
         return true;
     }
 
+
+
+    @Override
     public boolean isEmpty() {
         return root == null;
     }
 
+    @Override
     public int size() {
 //        int rta= 0;
 //
@@ -115,6 +164,8 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         return size;
     }
 
+
+    @Override
     public void dump() {
         Node current = root;
 
@@ -125,6 +176,8 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         }
     }
 
+
+    @Override
     public boolean equals(Object other) {
         if (other == null || !  (other instanceof SortedLinkedList) )
             return false;
@@ -163,6 +216,7 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         return -1;
     }
 
+    @Override
     public T getMin() {
         if (root == null)
             return null;
@@ -170,6 +224,8 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         return root.data;
     }
 
+
+    @Override
     public T getMax() {
 //
 //        if (root == null)
@@ -187,17 +243,6 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         return max;
     }
 
-    private final class Node {
-        private T data;
-        private Node next;
-
-        private Node(T data, Node next) {
-            this.data= data;
-            this.next= next;
-        }
-
-    }
-
     public Iterator<T> iterator(){
         return new Iterator<T>() {
             Node current = root;
@@ -208,11 +253,42 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
 
             @Override
             public T next() {
+                if(!hasNext()) throw new NoSuchElementException();
                 T aux = current.data;
                 current = current.next;
                 return aux;
             }
         };
+    }
+
+    private final class Node {
+        private T data;
+        private Node next;
+
+        private Node(T data, Node next) {
+            this.data= data;
+            this.next= next;
+        }
+
+        public Node insert(T data, boolean[] rta) {
+            if(this.data.compareTo(data)==0){
+                System.out.printf("Insertion failed. %s repeated%n", data);
+                rta[0] = false;
+                return this;
+            }
+            if(this.data.compareTo(data) < 0){
+                if(next == null){
+                    max = data;
+                    rta[0] = true;
+                    next = new Node(data, null);
+                    return this;
+                }
+                next = next.insert(data, rta);
+                return this;
+            }
+            rta[0] = true;
+            return new Node(data, this);
+        }
     }
 
     public IteratorWithOp<T> iterWithOp(){
@@ -254,6 +330,8 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
             }
         };
     }
+
+
 
     public static void main(String[] args) {
         SortedLinkedList<String> l = new SortedLinkedList<>();
@@ -319,7 +397,6 @@ public class SortedLinkedList<T extends Comparable<? super T>>{
         System.out.println();
         iter.insert("ba");
         l.dump();
-
     }
 
 
