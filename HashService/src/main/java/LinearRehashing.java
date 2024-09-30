@@ -40,18 +40,9 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
             throw new IllegalArgumentException(msg);
         }
 
-        double threshold = 0.75;
-        if ((double) size / Lookup.length >= threshold) {
-            resize();
-        }
+        if((double) size / Lookup.length > 0.75) resize();
 
         int auxKey = hash(key);
-        if (Lookup[auxKey] == null) {
-            Lookup[hash(key)] = new Slot<>(key, data);
-            size++;
-            return;
-        }
-
         int index = Lookup.length;
         while (Lookup[auxKey] != null) {
             if (Lookup[auxKey].key.equals(key)) return;
@@ -67,6 +58,7 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
             size++;
             return;
         }
+
         Lookup[auxKey] = new Slot<>(key, data);
         size++;
     }
@@ -105,7 +97,7 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
         }
         if(Lookup[i]==null) return false;
 
-        if(Lookup[i+1]==null) {
+        if(Lookup[(i+1) % Lookup.length]==null) {
             Lookup[i]=null;
             return true;
         }
@@ -149,39 +141,72 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
     }
 
 
-    public static void main(String[] args) throws FileNotFoundException {
-        File file = new File("E:\\facu\\EDA\\EDA\\HashService\\src\\main\\resources\\amazon-categories30.txt");
-        Scanner input = new Scanner(file).useDelimiter("#");
+//    public static void main(String[] args) throws FileNotFoundException {
+//        File file = new File("E:\\facu\\EDA\\EDA\\HashService\\src\\main\\resources\\amazon-categories30.txt");
+//        Scanner input = new Scanner(file).useDelimiter("#");
+//
+//        LinearRehashing<String, String> hash = new LinearRehashing<>(s -> {
+//            int sum = 0;
+//            for(int i =0; i<s.length(); i++){
+//                sum = Math.abs(31 * sum + s.codePointAt(i));
+//            }
+//            return sum;
+//        });
+//
+//        while (input.hasNext()){
+//            String title = input.next();
+//            hash.insertOrUpdate(title, title);
+//            input.nextLine();
+//        }
+//        hash.dump();
+//        System.out.println();
+//        hash.remove("The Casebook of Sherlock Holmes, Volume 2 (Casebook of Sherlock Holmes)");
+//        hash.dump();
+//        System.out.println();
+//        System.out.println(hash.find("Batik"));
+//    }
 
-        LinearRehashing<String, String> hash = new LinearRehashing<>(s -> {
-            int sum = 0;
-            for(int i =0; i<s.length(); i++){
-                sum = Math.abs(31 * sum + s.codePointAt(i));
-            }
-            return sum;
-        });
 
-        while (input.hasNext()){
-            String title = input.next();
-            hash.insertOrUpdate(title, title);
-            input.nextLine();
-        }
-        hash.dump();
+	public static void main(String[] args) {
+		LinearRehashing<Integer, String> myHash= new LinearRehashing<>(f->f);
+        myHash.insertOrUpdate(3, "Dick");
+        myHash.dump();
         System.out.println();
-        hash.remove("The Casebook of Sherlock Holmes, Volume 2 (Casebook of Sherlock Holmes)");
-        hash.dump();
+
+        myHash.insertOrUpdate(23, "Joe");
+        myHash.dump();
         System.out.println();
-        System.out.println(hash.find("Batik"));
+
+        myHash.insertOrUpdate(4, "Sue");
+        myHash.dump();
+        System.out.println();
+
+        myHash.insertOrUpdate(15, "Meg");
+        myHash.dump();
+        System.out.println();
+
+        myHash.remove(23); //Joe
+        myHash.dump();
+        System.out.println();
+
+        myHash.remove(15);//Meg
+        myHash.dump();
+        System.out.println();
+
+        myHash.insertOrUpdate(4, "Sue");
+        myHash.dump();
+        System.out.println();
+
+        myHash.insertOrUpdate(43, "Paul");
+        myHash.dump();
+        System.out.println();
+
+        myHash.insertOrUpdate(60, "60");
+        myHash.dump();
+        System.out.println();
+
+        myHash.insertOrUpdate(5, "5");
+        myHash.dump();
+        System.out.println();
     }
-
-
-//	public static void main(String[] args) {
-//		ClosedHashing<Integer, String> myHash= new ClosedHashing<>(f->f);
-//		myHash.insertOrUpdate(55, "Ana");
-//		myHash.insertOrUpdate(29, "Victor");
-//		myHash.insertOrUpdate(25, "Tomas");
-//		myHash.insertOrUpdate(19, "Lucas");
-//		myHash.insertOrUpdate(21, "Sol");
-//		myHash.dump();
-//	}
 }
