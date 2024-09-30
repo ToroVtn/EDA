@@ -3,8 +3,9 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.function.Function;
 
-public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
+public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
     final private int initialLookupSize= 10;
+    final private double threshold = 0.75;
     private int size = 0;
     // estática. No crece. Espacio suficiente...
     @SuppressWarnings({"unchecked"})
@@ -12,7 +13,7 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
 
     private Function<? super K, Integer> prehash;
 
-    public ClosedHashing( Function<? super K, Integer> mappingFn) {
+    public LinearRehashing( Function<? super K, Integer> mappingFn) {
         if (mappingFn == null)
             throw new RuntimeException("fn not provided");
 
@@ -41,7 +42,7 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
             throw new IllegalArgumentException(msg);
         }
 
-        if(size==Lookup.length){
+        if((double) size /Lookup.length >= threshold){
             resize();
         }
 
@@ -52,29 +53,46 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
             return;
         }
 
-        if(Lookup[auxKey].key != key) throw new IllegalArgumentException("Collision");
+        int index = Lookup.length;
+        while(Lookup[auxKey]!=null){
+            if(Lookup[auxKey].key.equals(key)) return;
+
+            if(Lookup[auxKey].deleted) index = auxKey;
+
+            auxKey++;
+            if(auxKey==Lookup.length) auxKey=0;
+        }
+
+        if(index != Lookup.length){
+            Lookup[index] = new Slot<>(key, data);
+            size++;
+            return;
+        }
         Lookup[auxKey] = new Slot<>(key, data);
+        size++;
     }
 
     private void resize() {
         Slot<K,V>[] oldLookup= Lookup;
         Lookup= (Slot<K,V>[]) new Slot[Lookup.length*2];
-        for (Slot<K, V> slot : oldLookup) {
-            insertOrUpdate(slot.key, slot.value);
+        for (int i=0; i<oldLookup.length; i++) {
+            if (oldLookup[i] != null) {
+                insertOrUpdate(oldLookup[i].key, oldLookup[i].value);
+            }
         }
     }
 
 
-    // find or get
+    // find or get TODO
     public V find(K key) {
         if (key == null)
             return null;
-
-        Slot<K, V> entry = Lookup[hash(key)];
-        if (entry == null)
-            return null;
-
-        return entry.value;
+        int index = hash(key);
+        while(Lookup[index]!=null){
+            if(Lookup[index].key.equals(key)) return Lookup[hash(key)].value;
+            index++;
+        }
+        return null;
     }
 
     public boolean remove(K key) {
@@ -82,10 +100,19 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
             return false;
 
         // lo encontre?
-        if (Lookup[ hash( key) ] == null)
-            return false;
+        int i = hash(key);
+        while(Lookup[i]!=null && !Lookup[i].key.equals(key)){
+            i++;
+        }
+        if(Lookup[i]==null) return false;
 
-        Lookup[ hash( key) ] = null;
+        if(Lookup[i+1]==null) {
+            Lookup[i]=null;
+            return true;
+        }
+
+        Lookup[i].deleted=true;
+        size--;
         return true;
     }
 
@@ -110,6 +137,7 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
     static private final class Slot<K, V>	{
         private final K key;
         private V value;
+        private boolean deleted = false;
 
         private Slot(K theKey, V theValue){
             key= theKey;
@@ -118,7 +146,7 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
 
 
         public String toString() {
-            return String.format("(key=%s, value=%s)", key, value );
+            return String.format("(key=%s, value=%s, deleted=%s)", key, value, deleted);
         }
     }
 
@@ -127,7 +155,7 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
         File file = new File("E:\\facu\\EDA\\EDA\\HashService\\src\\main\\resources\\amazon-categories30.txt");
         Scanner input = new Scanner(file).useDelimiter("#");
 
-        ClosedHashing<String, String> hash = new ClosedHashing<>(s -> {
+        LinearRehashing<String, String> hash = new LinearRehashing<>(s -> {
             int sum = 0;
             for(int i =0; i<s.length(); i++){
                 sum = Math.abs(31 * sum + s.codePointAt(i));
@@ -140,6 +168,12 @@ public class ClosedHashing<K, V> implements IndexParametricService<K, V> {
             hash.insertOrUpdate(title, title);
             input.nextLine();
         }
+        hash.dump();
+        System.out.println();
+        hash.remove("The Casebook of Sherlock Holmes, Volume 2 (Casebook of Sherlock Holmes)");
+        hash.dump();
+        System.out.println();
+        System.out.println(hash.find("Batik"));
     }
 
 
