@@ -1,11 +1,9 @@
 import java.io.*;
-import java.util.Properties;
 import java.util.Scanner;
 import java.util.function.Function;
 
 public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
     final private int initialLookupSize= 10;
-    final private double threshold = 0.75;
     private int size = 0;
     // estática. No crece. Espacio suficiente...
     @SuppressWarnings({"unchecked"})
@@ -32,38 +30,39 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
 
     public void insertOrUpdate(K key, V data) {
         if (key == null || data == null) {
-            String msg= String.format("inserting or updating (%s,%s). ", key, data);
-            if (key==null)
-                msg+= "Key cannot be null. ";
+            String msg = String.format("inserting or updating (%s,%s). ", key, data);
+            if (key == null)
+                msg += "Key cannot be null. ";
 
-            if (data==null)
-                msg+= "Data cannot be null.";
+            if (data == null)
+                msg += "Data cannot be null.";
 
             throw new IllegalArgumentException(msg);
         }
 
-        if((double) size /Lookup.length >= threshold){
+        double threshold = 0.75;
+        if ((double) size / Lookup.length >= threshold) {
             resize();
         }
 
         int auxKey = hash(key);
-        if(Lookup[auxKey]==null){
+        if (Lookup[auxKey] == null) {
             Lookup[hash(key)] = new Slot<>(key, data);
             size++;
             return;
         }
 
         int index = Lookup.length;
-        while(Lookup[auxKey]!=null){
-            if(Lookup[auxKey].key.equals(key)) return;
+        while (Lookup[auxKey] != null) {
+            if (Lookup[auxKey].key.equals(key)) return;
 
-            if(Lookup[auxKey].deleted) index = auxKey;
+            if (Lookup[auxKey].deleted) index = auxKey;
 
             auxKey++;
-            if(auxKey==Lookup.length) auxKey=0;
+            if (auxKey == Lookup.length) auxKey = 0;
         }
 
-        if(index != Lookup.length){
+        if (index != Lookup.length) {
             Lookup[index] = new Slot<>(key, data);
             size++;
             return;
@@ -75,15 +74,15 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
     private void resize() {
         Slot<K,V>[] oldLookup= Lookup;
         Lookup= (Slot<K,V>[]) new Slot[Lookup.length*2];
-        for (int i=0; i<oldLookup.length; i++) {
-            if (oldLookup[i] != null) {
-                insertOrUpdate(oldLookup[i].key, oldLookup[i].value);
+        for (Slot<K, V> slot : oldLookup) {
+            if (slot != null) {
+                insertOrUpdate(slot.key, slot.value);
             }
         }
     }
 
 
-    // find or get TODO
+    // find or get
     public V find(K key) {
         if (key == null)
             return null;
@@ -128,15 +127,14 @@ public class LinearRehashing<K, V> implements IndexParametricService<K, V> {
 
 
     public int size() {
-        // todavia no esta implementado
-        return 0;
+        return size;
     }
 
 
 
     static private final class Slot<K, V>	{
         private final K key;
-        private V value;
+        private final V value;
         private boolean deleted = false;
 
         private Slot(K theKey, V theValue){
