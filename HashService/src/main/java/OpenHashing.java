@@ -9,7 +9,7 @@ public class OpenHashing<K, V> implements IndexParametricService<K, V> {
     private int totalSize = 0, arraySize = 0;
 
     @SuppressWarnings({"unchecked"})
-    private List<Slot<K, V>>[] Lookup = new List[initialLookupSize]; // TODO make each individual List a tree
+    private List<Slot<K, V>>[] Lookup = new List[initialLookupSize]; // TODO make each individual List a tree (nodes could have a next)
 
     private Function<? super K, Integer> prehash;
 
