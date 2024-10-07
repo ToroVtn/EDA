@@ -54,7 +54,7 @@ public class IntList {
     public int SplitAndErase( int umbral, IntList result ){
         Item it = first;
         Item prev = null;
-        Item it2 = result.first == null? result.first : result.last;
+        Item it2 = result.first == null ? null : result.last;
         int rep = 0;
         while(it != null){
             if(it.numero < umbral){

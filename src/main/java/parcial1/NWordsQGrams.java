@@ -35,6 +35,7 @@ public class NWordsQGrams{
             }
         }
 
+        //core loop
         int i = N-1;
         while(sc.hasNext()) {
             for(String w : words) Qgrams[i] += w + " ";
