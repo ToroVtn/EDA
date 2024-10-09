@@ -9,7 +9,14 @@ public class Evaluator {
 
     public Double evaluate() {
         Scanner inputScanner = new Scanner(System.in).useDelimiter("\\n");
-        System.out.print("Introduzca la expresión en notación prefija: ");
+        System.out.print("Introduzca la expresión en notación infija: ");
+        lineScanner = new Scanner(inputScanner.next()).useDelimiter("\\s+");
+        return evaluatePostfix(infixToPostfix());
+    }
+
+
+    public Double evaluateInfix(String exp) {
+        Scanner inputScanner = new Scanner(exp).useDelimiter("\\n");
         lineScanner = new Scanner(inputScanner.next()).useDelimiter("\\s+");
         return evaluatePostfix(infixToPostfix());
     }

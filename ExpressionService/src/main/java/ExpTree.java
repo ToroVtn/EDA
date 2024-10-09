@@ -1,5 +1,5 @@
+import java.util.Map;
 import java.util.Scanner;
-
 
 public class ExpTree implements ExpressionService {
 
@@ -10,10 +10,9 @@ public class ExpTree implements ExpressionService {
 
         // token analyzer
         Scanner inputScanner = new Scanner(System.in).useDelimiter("\\n");
-        String line= inputScanner.nextLine();
+        buildTree(inputScanner.next());
         inputScanner.close();
 
-        buildTree(line);
     }
 
     private void buildTree(String line) {
@@ -22,9 +21,6 @@ public class ExpTree implements ExpressionService {
         root= new Node(lineScanner);
         lineScanner.close();
     }
-
-
-
 
     static final class Node {
         private String data;
@@ -47,7 +43,6 @@ public class ExpTree implements ExpressionService {
         private Node() 	{
         }
 
-
         private Node buildExpression() {
             Node n = new Node();
 
@@ -67,7 +62,7 @@ public class ExpTree implements ExpressionService {
 
                 n.right = buildExpression();
 
-                if (!lineScanner.hasNext("\\)")) {
+                if (lineScanner.hasNext("\\)")) {
                     lineScanner.next();
                 } else {
                     throw new RuntimeException("missing )");
@@ -81,22 +76,48 @@ public class ExpTree implements ExpressionService {
 
             n.data = lineScanner.next();
             if(!Utils.isConstant(n.data)){
-                throw new RuntimeException(String.format("bad term: %s", lineScanner));
+                if(!isVariable(n.data))
+                    throw new RuntimeException(String.format("bad term: %s", lineScanner));
             }
 
             return n;
         }
 
+        private boolean isVariable(String data) {
+            return !data.matches("[0-9].+");
+        }
+    }
 
+    public double eval(){
+        return evalRec(root);
+    }
 
-    }  // end Node class
+    private double evalRec(Node node) {
+        if(node.left != null){ // && node.right != null
+            switch(node.data){
+                case "+":   return evalRec(node.left) + evalRec(node.right);
+                case "-":   return evalRec(node.left) - evalRec(node.right);
+                case "*":   return evalRec(node.left) * evalRec(node.right);
+                case "/":   return evalRec(node.left) / evalRec(node.right);
+                case "^":   return Math.pow(evalRec(node.left), evalRec(node.right));
+            }
+        }
 
+        if(Utils.isConstant(node.data)) return Double.valueOf(node.data);
 
+        Scanner sc = new Scanner(System.in);
+        System.out.printf("%s = ", node.data);
+        Double var = Double.valueOf(sc.nextLine());
+        return var;
+    }
 
     // hasta que armen los testeos
     public static void main(String[] args) {
         ExpressionService myExp = new ExpTree();
 
+        System.out.println(myExp.eval());
+
+
     }
 
-}  // end ExpTree class
+}
