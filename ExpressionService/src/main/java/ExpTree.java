@@ -14,7 +14,6 @@ public class ExpTree implements ExpressionService {
         // token analyzer
         Scanner inputScanner = new Scanner(System.in).useDelimiter("\\n");
         buildTree(inputScanner.next());
-        inputScanner.close();
     }
 
     private void buildTree(String line) {
@@ -108,7 +107,9 @@ public class ExpTree implements ExpressionService {
 
         if(Utils.isConstant(node.data)) return Double.valueOf(node.data);
 
-        return var.get(node.data);
+        Scanner scan = new Scanner(System.in);
+        System.out.printf("%s = ", node.data);
+        return scan.nextDouble();
     }
 
     public void setVar(Map<String, Double> variables) {
@@ -125,8 +126,5 @@ public class ExpTree implements ExpressionService {
         myExp.setVar(variables);
 
         System.out.println(myExp.eval());
-
-
     }
-
 }
