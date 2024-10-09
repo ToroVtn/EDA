@@ -1,9 +1,12 @@
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 public class ExpTree implements ExpressionService {
 
     private Node root;
+    private Map<String, Double> var;
+    private boolean varSet = false;
 
     public ExpTree() {
         System.out.print("Introduzca la expresión en notación infija con todos los paréntesis y blancos: ");
@@ -12,7 +15,6 @@ public class ExpTree implements ExpressionService {
         Scanner inputScanner = new Scanner(System.in).useDelimiter("\\n");
         buildTree(inputScanner.next());
         inputScanner.close();
-
     }
 
     private void buildTree(String line) {
@@ -89,6 +91,7 @@ public class ExpTree implements ExpressionService {
     }
 
     public double eval(){
+        if (!varSet) throw new RuntimeException("variables not set");
         return evalRec(root);
     }
 
@@ -105,15 +108,21 @@ public class ExpTree implements ExpressionService {
 
         if(Utils.isConstant(node.data)) return Double.valueOf(node.data);
 
-        Scanner sc = new Scanner(System.in);
-        System.out.printf("%s = ", node.data);
-        Double var = Double.valueOf(sc.nextLine());
-        return var;
+        return var.get(node.data);
+    }
+
+    public void setVar(Map<String, Double> variables) {
+        var = variables;
+        varSet = true;
     }
 
     // hasta que armen los testeos
     public static void main(String[] args) {
         ExpressionService myExp = new ExpTree();
+
+        Map<String, Double> variables = new HashMap<>();
+        variables.put("x", 2.0);
+        myExp.setVar(variables);
 
         System.out.println(myExp.eval());
 
