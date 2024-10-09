@@ -118,7 +118,7 @@ public class BinaryTree implements BinaryTreeService {
 
 
 	// hasta el get() no se evalua
-	class Node {
+	static class Node {
 		private String data;
 		private Node left;
 		private Node right;
