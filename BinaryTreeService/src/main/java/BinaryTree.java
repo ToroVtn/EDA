@@ -143,7 +143,13 @@ public class BinaryTree implements BinaryTreeService {
 			return left == null && right == null;
 		}
 
-
+		@Override
+		public boolean equals(Object obj) {
+			if(obj instanceof Node other) {
+				return data.equals(other.data);
+			}
+			return false;
+		}
 	}  // end Node class
 
 	
@@ -192,6 +198,28 @@ public class BinaryTree implements BinaryTreeService {
 		printHierarchy(node.right, tabs+1);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if(obj.getClass() != this.getClass()) return false;
+
+		BinaryTree other = (BinaryTree) obj;
+
+		return nodesEqual(root, other.root);
+	}
+
+	private boolean nodesEqual(Node n1, Node n2) {
+		if(n1 == null && n2 == null) return true;
+
+		if(!n1.equals(n2)) return false;
+		if(nodesEqual(n1.left, n2.left) && nodesEqual(n1.right, n2.right)) return true;
+
+		return false;
+	}
+
+	public void printTree(){
+		//should print tree like data0_3
+	}
+
 	public static void main(String[] args) throws FileNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		BinaryTreeService rta = new BinaryTree("data0_1");
 		rta.printHierarchy();
@@ -199,6 +227,10 @@ public class BinaryTree implements BinaryTreeService {
 		rta = new BinaryTree("data0_3");
 		rta.printHierarchy();
 		System.out.println();
+
+		BinaryTreeService rta2 = new BinaryTree("data0_3");
+
+		System.out.println(rta.equals(rta2));
 	}
 
 }  
