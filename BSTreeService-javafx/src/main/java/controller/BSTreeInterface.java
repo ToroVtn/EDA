@@ -6,7 +6,7 @@ public interface BSTreeInterface<T> {
     NodeTreeInterface<T> getRoot();
 
     void insert(T i);
-
+    void remove(T i);
     void postOrder();
     void preOrder();
     void inOrder();

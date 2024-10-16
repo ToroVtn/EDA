@@ -2,8 +2,8 @@ import controller.NodeTreeInterface;
 
 public class Node<T extends Comparable<? super T>> implements NodeTreeInterface<T> {
     private T data;
-    private Node<T> left;
-    private Node<T> right;
+    private NodeTreeInterface<T> left;
+    private NodeTreeInterface<T> right;
 
     public Node(T data) {
         this.data = data;
@@ -24,11 +24,16 @@ public class Node<T extends Comparable<? super T>> implements NodeTreeInterface<
         return data;
     }
 
-    public void setLeft(Node node) {
+    public void setLeft(NodeTreeInterface<T> node) {
         this.left = node;
     }
 
-    public void setRight(Node node) {
+    public void setRight(NodeTreeInterface<T> node) {
         this.right = node;
+    }
+
+    @Override
+    public void setData(T data) {
+        this.data = data;
     }
 }

@@ -19,32 +19,68 @@ public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> 
     @Override
     public void insert(T data) {
         if(root == null) {
-            root = new Node(data);
+            root = new Node<>(data);
             return;
         }
 
         int h = 0;
         NodeTreeInterface<T> aux = root;
-        Node<T> prev = (Node<T>) root;
+        NodeTreeInterface<T> prev = root;
 
         while(aux!=null){
             if(data.compareTo(aux.getData())<=0){
-                prev = (Node<T>) aux;
+                prev = aux;
                 aux = aux.getLeft();
                 h++;
             } else {
-                prev = (Node<T>) aux;
+                prev = aux;
                 aux = aux.getRight();
                 h++;
             }
         }
 
         if(data.compareTo(prev.getData())<=0){
-            prev.setLeft(new Node(data));
+            prev.setLeft(new Node<>(data));
         } else {
-            prev.setRight(new Node(data));
+            prev.setRight(new Node<>(data));
         }
         if(h>height) height = h;
+    }
+
+    public void remove(T data) {
+        root = remove(data, root);
+    }
+
+    private NodeTreeInterface<T> remove(T data, NodeTreeInterface<T> node) {
+        if(node==null) return null;
+
+        if(node.getData().compareTo(data)==0){
+            if(node.getLeft()==null) return node.getRight();
+            if(node.getRight()==null) return node.getLeft();
+            node.setData(lexiadjacent(node).getData());
+            return node;
+        }
+
+        if(data.compareTo(node.getData())<0) {
+            node.setLeft(remove(data, node.getLeft()));
+            return node;
+        }
+
+        node.setRight(remove(data, node.getRight()));
+        return node;
+    }
+
+    private NodeTreeInterface<T> lexiadjacent(NodeTreeInterface<T> candidate){
+        while(candidate.getLeft()!=null){
+            if(candidate.getRight()==null) {
+                NodeTreeInterface<T> temp = candidate;
+                candidate = candidate.getLeft();
+                temp.setLeft(null);
+
+            }
+            else candidate = candidate.getRight();
+        }
+        return candidate;
     }
 
     @Override
@@ -59,7 +95,7 @@ public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> 
         postorderRec(node.getLeft());
         postorderRec(node.getRight());
 
-        System.out.print(node.getData() + " ");
+        System.out.print(node.getData() + " | ");
     }
 
     @Override
@@ -71,7 +107,7 @@ public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> 
     private void preorderRec(NodeTreeInterface<T> node) {
         if (node == null) return;
 
-        System.out.print(node.getData() + " ");
+        System.out.print(node.getData() + " | ");
 
         preorderRec(node.getLeft());
         preorderRec(node.getRight());
@@ -87,7 +123,7 @@ public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> 
         if (node == null) return;
 
         inOrderRec(node.getLeft());
-        System.out.print(node.getData() + " ");
+        System.out.print(node.getData() + " | ");
         inOrderRec(node.getRight());
     }
 }

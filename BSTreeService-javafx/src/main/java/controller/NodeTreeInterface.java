@@ -6,4 +6,10 @@ public interface NodeTreeInterface<T> {
     NodeTreeInterface<T> getRight();
 
     T getData();
+
+    void setLeft(NodeTreeInterface<T> left);
+
+    void setRight(NodeTreeInterface<T> right);
+
+    void setData(T data);
 }
