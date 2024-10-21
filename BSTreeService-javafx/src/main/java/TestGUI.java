@@ -43,22 +43,20 @@ public class TestGUI extends Application {
     
 	private BST<Integer> createModel() {
 		BST<Integer> myTree = new BST<>();
-		myTree = new BST<>();
 		myTree.insert(35);
-		myTree.insert(40);
 		myTree.insert(74);
-		myTree.insert(55);
 		myTree.insert(20);
+		myTree.insert(22);
+		myTree.insert(55);
 		myTree.insert(15);
 		myTree.insert(8);
-		myTree.insert(22);
 		myTree.insert(27);
 		myTree.insert(25);
-		myTree.remove(40);
+
 		myTree.remove(20);
-		myTree.inOrder();
-		myTree.preOrder();
-		myTree.postOrder();
+
+		myTree.setTraversal(BST.Traversal.PREORDER);
+		myTree.forEach(t -> System.out.print(t + " "));
 
 		return myTree;
 	}

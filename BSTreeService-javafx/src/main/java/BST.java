@@ -1,10 +1,23 @@
 import controller.BSTreeInterface;
 import controller.NodeTreeInterface;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
 public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> {
 
     private NodeTreeInterface<T> root;
     private int height = 0;
+
+    enum Traversal {BYLEVELS, INORDER, PREORDER, POSTORDER}
+
+    private Traversal traversal = Traversal.INORDER;
+
+    public void setTraversal(Traversal traversal) {
+        this.traversal = traversal;
+    }
 
     @Override
     public int getHeight() {
@@ -47,40 +60,20 @@ public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> 
         if(h>height) height = h;
     }
 
+    @Override
+    public Iterator<T> iterator() {
+        switch(traversal){
+            case BYLEVELS: return new BSTByLevelIterator();
+            case INORDER: return new BSTInOrderIterator();
+            case PREORDER: return new BSTPreOrderIterator();
+            case POSTORDER: return new BSTPostOrderIterator();
+        }
+        throw new RuntimeException("Invalid traversal");
+    }
+
     public void remove(T data) {
-        root = remove(data, root);
-    }
-
-    private NodeTreeInterface<T> remove(T data, NodeTreeInterface<T> node) {
-        if(node==null) return null;
-
-        if(node.getData().compareTo(data)==0){
-            if(node.getLeft()==null) return node.getRight();
-            if(node.getRight()==null) return node.getLeft();
-            node.setData(lexiadjacent(node).getData());
-            return node;
-        }
-
-        if(data.compareTo(node.getData())<0) {
-            node.setLeft(remove(data, node.getLeft()));
-            return node;
-        }
-
-        node.setRight(remove(data, node.getRight()));
-        return node;
-    }
-
-    private NodeTreeInterface<T> lexiadjacent(NodeTreeInterface<T> candidate){
-        while(candidate.getLeft()!=null){
-            if(candidate.getRight()==null) {
-                NodeTreeInterface<T> temp = candidate;
-                candidate = candidate.getLeft();
-                temp.setLeft(null);
-
-            }
-            else candidate = candidate.getRight();
-        }
-        return candidate;
+        if(data == null) throw new IllegalArgumentException("data is null");
+        root = root.remove(data);
     }
 
     @Override
@@ -125,5 +118,95 @@ public class BST<T extends Comparable<? super T>> implements BSTreeInterface<T> 
         inOrderRec(node.getLeft());
         System.out.print(node.getData() + " | ");
         inOrderRec(node.getRight());
+    }
+
+    private class BSTInOrderIterator implements Iterator<T> {
+        private Stack<NodeTreeInterface<T>> stack = new Stack<>();
+        private NodeTreeInterface<T> current;
+         public BSTInOrderIterator() {
+             if(root != null) stack.push(root);
+         }
+
+        @Override
+        public boolean hasNext() {
+            return !stack.isEmpty() || current != null;
+        }
+
+        @Override
+        public T next() {
+             while(current!=null){
+                 stack.push(current);
+                 current = current.getLeft();
+             }
+             NodeTreeInterface<T> toReturn = stack.pop();
+             current = toReturn.getRight();
+             return toReturn.getData();
+        }
+    }
+
+    private class BSTPreOrderIterator implements Iterator<T> {
+        private NodeTreeInterface<T> current;
+        private Stack<NodeTreeInterface<T>> stack = new Stack<>();
+
+        public BSTPreOrderIterator() {
+            if(root != null) stack.push(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !stack.isEmpty() || current != null;
+        }
+
+        @Override
+        public T next() {
+            if(current == null) current = stack.pop();
+
+            if(current.getRight() != null) stack.push(current.getRight());
+
+            NodeTreeInterface<T> toReturn = current;
+            current = current.getLeft();
+            return toReturn.getData();
+        }
+    }
+
+    private class BSTPostOrderIterator implements Iterator<T> {
+        private Stack<NodeTreeInterface<T>> stack = new Stack<>();
+        private NodeTreeInterface<T> current;
+
+        public BSTPostOrderIterator() {
+
+        }
+
+        @Override
+        public T next() {
+            throw new RuntimeException("not implemented");
+        }
+
+        @Override
+        public boolean hasNext() {
+            throw new RuntimeException("not implemented");
+        }
+    }
+
+    private class BSTByLevelIterator implements Iterator<T> {
+        private Queue<NodeTreeInterface<T>> queue = new LinkedList<>();
+        public BSTByLevelIterator() {
+            if(root != null) queue.add(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !queue.isEmpty();
+        }
+
+        @Override
+        public T next() {
+            NodeTreeInterface<T> current = queue.remove();
+
+            if(current.getLeft() != null) queue.add(current.getLeft());
+            if(current.getRight() != null) queue.add(current.getRight());
+
+            return current.getData();
+        }
     }
 }

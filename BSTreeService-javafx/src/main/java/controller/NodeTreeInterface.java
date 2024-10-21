@@ -12,4 +12,6 @@ public interface NodeTreeInterface<T> {
     void setRight(NodeTreeInterface<T> right);
 
     void setData(T data);
+
+    NodeTreeInterface<T> remove(T data);
 }

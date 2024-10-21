@@ -1,6 +1,6 @@
 package controller;
 
-public interface BSTreeInterface<T> {
+public interface BSTreeInterface<T> extends Iterable<T>{
     int getHeight();
 
     NodeTreeInterface<T> getRoot();
