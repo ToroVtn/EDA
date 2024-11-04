@@ -4,7 +4,7 @@ import srcgraphs.GraphService.*;
 
 public class GraphBuilder<V,E> {
 	private Multiplicity multiplicity= Multiplicity.SIMPLE;
-	private EdgeMode edgeMode= EdgeMode.DIRECTED;
+	private EdgeMode edgeMode= EdgeMode.UNDIRECTED;
 	private SelfLoop acceptSelfLoops= SelfLoop.NO;
 	private Weight hasWeight= Weight.NO;
 	private Storage implementation= Storage.SPARSE;

@@ -1,16 +1,12 @@
 package srcgraphs;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-
-import java.util.Map;
+import java.util.*;
 
 abstract public class AdjacencyListGraph<V, E> implements GraphService<V, E> {
 
 	private boolean isSimple;
 	protected boolean isDirected;
-	private boolean acceptSelfLoop;
+	protected boolean acceptSelfLoop;
 	private boolean isWeighted;
 	protected String type;
 	
@@ -20,7 +16,7 @@ abstract public class AdjacencyListGraph<V, E> implements GraphService<V, E> {
 	// respeta el orden de llegada y facilita el testing
 	//	private Map<V,Collection<InternalEdge>> adjacencyList= new LinkedHashMap<>();
 	
-	protected   Map<V,  Collection<AdjacencyListGraph<V, E>.InternalEdge>> getAdjacencyList() {
+	protected   Map<V,  Collection<InternalEdge>> getAdjacencyList() {
 		return adjacencyList;
 	}
 	
@@ -45,12 +41,11 @@ abstract public class AdjacencyListGraph<V, E> implements GraphService<V, E> {
 	@Override
 	public void addVertex(V aVertex) {
 	
-		if (aVertex == null )
-		throw new IllegalArgumentException(Messages.getString("addVertexParamCannotBeNull"));
+		if (aVertex == null ) throw new IllegalArgumentException(Messages.getString("addVertexParamCannotBeNull"));
 	
 		// no edges yet
 		getAdjacencyList().putIfAbsent(aVertex, 
-				new ArrayList<InternalEdge>());
+				new ArrayList<>());
 	}
 
 	
@@ -103,61 +98,172 @@ abstract public class AdjacencyListGraph<V, E> implements GraphService<V, E> {
 
 	}
 
-	
-
-	
 	@Override
 	public boolean removeVertex(V aVertex) {
-		// COMPLETAR
-		throw new RuntimeException("not implemented yet");
+		if(aVertex == null || !adjacencyList.containsKey(aVertex)) return false;
+
+		adjacencyList.remove(aVertex);
+		Set<V> vertices = adjacencyList.keySet();
+		Iterator<V> it = vertices.iterator();
+		V current;
+		InternalEdge edge = new InternalEdge(null, aVertex);
+		while (it.hasNext()) {
+			current = it.next();
+			adjacencyList.get(current).remove(edge);
+		}
+		return true;
 	}
 
 	@Override
 	public boolean removeEdge(V aVertex, V otherVertex) {
-		// COMPLETAR
-		throw new RuntimeException("not implemented yet");
+		if(!adjacencyList.containsKey(aVertex) || !adjacencyList.containsKey(otherVertex)) return false;
+
+		adjacencyList.get(aVertex).remove(new InternalEdge(null, otherVertex));
+		if(!isDirected) return true;
+
+		adjacencyList.get(otherVertex).remove(new InternalEdge(null, aVertex));
+		return true;
 	}
 
 	
 	@Override
 	public boolean removeEdge(V aVertex, V otherVertex, E theEdge) {
-		// COMPLETAR
-		throw new RuntimeException("not implemented yet");
+		if(!adjacencyList.containsKey(aVertex) || !adjacencyList.containsKey(otherVertex)) return false;
+
+		adjacencyList.get(aVertex).remove(new InternalEdge(theEdge, otherVertex));
+		if(!isDirected) return true;
+
+		adjacencyList.get(otherVertex).remove(new InternalEdge(theEdge, aVertex));
+		return true;
 	}
-	
+
 	
 	@Override
 	public void dump() {
 		// COMPLETAR
 		throw new RuntimeException("not implemented yet");
 	}
-	
+
 	
 	@Override
 	public int degree(V aVertex) {
-		// COMPLETAR
-		throw new RuntimeException("not implemented yet");
+		if(aVertex == null) throw new IllegalArgumentException();
+		return adjacencyList.getOrDefault(aVertex, new ArrayList<>()).size();
 	}
 
-	
+
 
 	@Override
 	public int inDegree(V aVertex) {
-		// COMPLETAR
-		throw new RuntimeException("not implemented yet");
+		Set<V> vertices = adjacencyList.keySet();
+		Iterator<V> it = vertices.iterator();
+		V current;
+		InternalEdge edge = new InternalEdge(null, aVertex);
+		int deg = 0;
+		while(it.hasNext()) {
+			current = it.next();
+			if(!current.equals(aVertex)) {
+				if(getAdjacencyList().get(current).contains(edge)){
+					deg++;
+				}
+			}
+		}
+		return deg;
 	}
 
 
 
 	@Override
 	public int outDegree(V aVertex) {
-		// COMPLETAR
-		throw new RuntimeException("not implemented yet");
+		return adjacencyList.getOrDefault(aVertex, new ArrayList<>()).size();
 	}
 
-	
+	@Override
+	public void printBFS(V aVertex){
+		if(!adjacencyList.containsKey(aVertex)) return;
+		Map<V, Boolean> visited = new HashMap<>();
+		Queue<V> queue = new LinkedList<>();
+		queue.add(aVertex);
+		V current, toQueue;
+		Iterator<InternalEdge> it;
+		while(!queue.isEmpty()){
+			current = queue.remove();
+			it = adjacencyList.get(current).iterator();
 
-	
+			//add nodes to process
+			while(it.hasNext()){
+				toQueue = it.next().target;
+				if(!visited.getOrDefault(toQueue, false)) {
+					queue.add(toQueue);
+				}
+			}
+
+			visited.put(current, true);
+			System.out.printf("%s ", current);
+		}
+	}
+
+	@Override
+	public void printDFS(V aVertex){
+		if(!adjacencyList.containsKey(aVertex)) return;
+		Set<V> visited = new HashSet<>();
+		Stack<V> stack = new Stack<>();
+		stack.push(aVertex);
+		V current, toStack;
+		Iterator<InternalEdge> it;
+		while(!stack.isEmpty()){
+			current = stack.pop();
+			it = adjacencyList.get(current).iterator();
+
+			//add nodes to process
+			while(it.hasNext()) {
+				toStack = it.next().target;
+				if (!visited.contains(toStack)) {
+					stack.push(toStack);
+				}
+			}
+
+			if(!visited.contains(current)) {
+				visited.add(current);
+				System.out.printf("%s ", current);
+			}
+		}
+	}
+
+	@Override
+	public Iterator<V> DFSIterator(V aVertex){
+		if(!adjacencyList.containsKey(aVertex)) return null;
+
+		Stack<V> stack = new Stack<>();
+		stack.push(aVertex);
+
+		return new Iterator<V>() {
+			Set<V> visited = new HashSet<>();
+			Iterator<InternalEdge> it;
+			V current = aVertex;
+			V toStack;
+			@Override
+			public boolean hasNext() {
+				return !stack.isEmpty();
+			}
+
+			@Override
+			public V next() {
+				current = stack.pop();
+
+				it = adjacencyList.get(current).iterator();
+				while(it.hasNext()){
+					toStack = it.next().target;
+					if(!visited.contains(toStack)) {
+						stack.push(toStack);
+					}
+				}
+
+				visited.add(current);
+				return current;
+			}
+		};
+	}
 	
 	class InternalEdge {
 		E edge;

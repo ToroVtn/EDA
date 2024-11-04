@@ -4,6 +4,7 @@ package srcgraphs; /**
 
 
 import java.util.Collection;
+import java.util.Iterator;
 
 
 // same interface for graph, digraph, multigraph, weighted graph, etc
@@ -94,5 +95,11 @@ public interface GraphService<V,E> {
 	// only for simple graph/digraph
 	// multi: throw exception
 //	public DijkstraPath<V,E> dijsktra(V source);
-	
+
+	void printBFS(V aVertex);
+	void printDFS(V aVertex);
+	Iterator<V> DFSIterator(V aVertex);
+	DijkstraPath<V, E> dijsktra(V source);
+	boolean isBipartite();
+	boolean hasCicle();
 }
